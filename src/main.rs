@@ -1,4 +1,6 @@
+
 use dioxus::prelude::*;
+use dioxus_desktop::{Config, WindowBuilder};
 
 // 定义页面枚举
 #[derive(PartialEq, Clone)]
@@ -45,6 +47,29 @@ fn App(cx: Scope) -> Element {
                     Page::Home => rsx! {
                         div {
                             h1 { "欢迎来到首页" }
+                            table {
+                                style: "width: 100%; border-collapse: collapse; margin-top: 20px;",
+                                tr {
+                                    th { "姓名" }
+                                    th { "年龄" }
+                                    th { "性别" }
+                                }
+                                tr {
+                                    td { "张三" }
+                                    td { "25" }
+                                    td { "男" }
+                                }
+                                tr {
+                                    td { "李四" }
+                                    td { "30" }
+                                    td { "女" }
+                                }
+                            }
+                            input {
+                                style: "width: 100%; padding: 10px; margin-bottom: 10px;",
+                                placeholder: "请输入",
+                                oninput: move |e| println!("{}", e.value),
+                            }
                             p { "这是一个使用 Dioxus 构建的桌面应用示例。" }
                         }
                     },
@@ -81,6 +106,16 @@ fn App(cx: Scope) -> Element {
     })
 }
 
+
+
 fn main() {
-    dioxus_desktop::launch(App);
+
+    let desktop_config = Config::new()
+        .with_window(
+            WindowBuilder::new()
+                .with_title("Dioxus Desktop App")
+               
+        );
+    dioxus_desktop::launch_cfg(App,  desktop_config);
+ 
 }
