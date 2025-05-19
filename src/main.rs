@@ -1,8 +1,10 @@
 
 use dioxus::prelude::*;
-use dioxus_desktop::{Config, WindowBuilder};
+use dioxus_desktop::{tao::dpi, Config, WindowBuilder};
+use dioxus_desktop::tao::dpi::Position;
+use dioxus_desktop::tao;
 
-// 定义页面枚举
+
 #[derive(PartialEq, Clone)]
 enum Page {
     Home,
@@ -19,6 +21,7 @@ fn App(cx: Scope) -> Element {
             style: "display: flex;",
             // 左侧导航栏
             div {
+                class: "sidebar",
                 style: "width: 200px; background-color: #f0f0f0; padding: 20px; height: 90vh;",
                 h2 { "导航菜单" }
                 div {
@@ -109,13 +112,26 @@ fn App(cx: Scope) -> Element {
 
 
 fn main() {
+    let event_loop = tao::event_loop::EventLoop::new();
+    let primary_monitor = event_loop.primary_monitor().unwrap(); 
+    let screen_size = primary_monitor.size(); 
 
-    let desktop_config = Config::new()
-        .with_window(
-            WindowBuilder::new()
-                .with_title("Dioxus Desktop App")
-               
-        );
-    dioxus_desktop::launch_cfg(App,  desktop_config);
- 
+    let window_size = dpi::PhysicalSize::new(1000, 600); 
+    let x = ((screen_size.width - window_size.width) / 2).try_into().unwrap();
+    let y = ((screen_size.height - window_size.height) / 2).try_into().unwrap();
+
+    let icon_bytes = include_bytes!("icons/title_icon.png");
+    let img = image::load_from_memory(icon_bytes).expect("REASON").into_rgba8(); // 转换为 RGBA8 格式
+    let (width, height) = (img.width(), img.height());
+    let rgba_data = img.into_raw();
+
+    let window = WindowBuilder::new()
+        .with_title("Dioxus Desktop App")
+        .with_position(Position::Physical(dpi::PhysicalPosition::new(x,y)))
+        .with_inner_size(dpi::Size::new(dpi::PhysicalSize::new(window_size.width,window_size.height)))
+        .with_window_icon(Some(tao::window::Icon::from_rgba(rgba_data, width, height).expect("msg")))
+        ;
+
+    let desktop_config = Config::new().with_window(window);
+    dioxus_desktop::launch_cfg(App, desktop_config);
 }
