@@ -1,7 +1,6 @@
 
 use dioxus::prelude::*;
 use dioxus_desktop::{tao::dpi, Config, WindowBuilder};
-use dioxus_desktop::tao::dpi::Position;
 use dioxus_desktop::tao;
 
 
@@ -121,15 +120,14 @@ fn main() {
     let y = ((screen_size.height - window_size.height) / 2).try_into().unwrap();
 
     let icon_bytes = include_bytes!("icons/title_icon.png");
-    let img = image::load_from_memory(icon_bytes).expect("REASON").into_rgba8(); // 转换为 RGBA8 格式
-    let (width, height) = (img.width(), img.height());
-    let rgba_data = img.into_raw();
+    let img = image::load_from_memory(icon_bytes).expect("REASON").into_rgba8(); 
+    let (width, height,rgb) = (img.width(), img.height(), img.into_raw());
 
     let window = WindowBuilder::new()
         .with_title("Dioxus Desktop App")
-        .with_position(Position::Physical(dpi::PhysicalPosition::new(x,y)))
+        .with_position(dpi::Position::Physical(dpi::PhysicalPosition::new(x,y)))
         .with_inner_size(dpi::Size::new(dpi::PhysicalSize::new(window_size.width,window_size.height)))
-        .with_window_icon(Some(tao::window::Icon::from_rgba(rgba_data, width, height).expect("msg")))
+        .with_window_icon(Some(tao::window::Icon::from_rgba(rgb, width, height).expect("msg")))
         ;
 
     let desktop_config = Config::new().with_window(window);
